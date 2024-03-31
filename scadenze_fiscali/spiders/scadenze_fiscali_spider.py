@@ -1,21 +1,30 @@
-from scrapy.spider import BaseSpider
-from scrapy.selector import HtmlXPathSelector
+import logging
+from scrapy import Spider
+# from scrapy.selector import HtmlXPathSelector
+from scrapy.selector import Selector
 from scrapy.http.request import Request
 from scadenze_fiscali.items import ScadenzeFiscaliItem
-from urlparse import urljoin
-from scrapy import log
+#from urlparse import urljoin
+from urllib.parse import urljoin
 
 
-class ScadenzeFiscaliSpider(BaseSpider):
+logger = logging.getLogger(__name__)
+logger.warning("This is a warning")
+#from scrapy import log
+
+
+class ScadenzeFiscaliSpider(Spider):
     name = "scadenze_fiscali"
     allowed_domains = ["agenziaentrate.gov.it"]
-    year = 2012
+    year : int = 2012
     start_urls = [
-        "http://www1.agenziaentrate.gov.it/documentazione/scadenzefiscali/index.htm?selezionetemporale=mese&mese=%02d-%d" % (n, year) for n in range(1, 12)
+        #f"http://www1.agenziaentrate.gov.it/documentazione/scadenzefiscali/index.htm?selezionetemporale=mese&mese={n:02}-{year}" for n in range(1, 12)
+        f"https://www1.agenziaentrate.gov.it/servizi/scadenzario/main.php?mesesel={n:02}-2023" for n in range(1, 12)
     ]
 
     def parse(self, response):
-        hxs = HtmlXPathSelector(response)
+        #hxs = HtmlXPathSelector(response)
+        hxs = Selector(response)
         deadlines = hxs.select("//div[@id='lista_scad_fisc']/ul")
         items = []
 
